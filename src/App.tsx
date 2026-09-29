@@ -2,30 +2,44 @@ import { useEffect, useMemo, useState } from 'react';
 import type { AssemblyStep, Checkpoint } from './types';
 import { samplePlan } from './data/samplePlan';
 import {
-  completeStep,
+  attemptCompleteStep,
   createEmptyProgress,
+  getCheckpointEditBlock,
+  getStepEntryBlock,
+  hydrateProgress,
+  markMissingPartReceived,
   overallProgress,
-  removeMissingPartReport,
   reportMissingPart,
+  resumeAssembly,
   searchSteps,
-  setPaused,
   toggleCheckpoint,
-  uncompleteStep,
+  undoStepCompletion,
+  type StepBlock,
 } from './lib/assembly';
 import { clearProgress, loadPlan, loadProgress, savePlan, saveProgress } from './lib/storage';
-import { StepCard } from './components/StepCard';
+import { StepCard, describeStepBlock } from './components/StepCard';
 import { MissingPartsPanel } from './components/MissingPartsPanel';
 import { MaterialsView } from './components/MaterialsView';
 import { AdminPanel } from './components/AdminPanel';
 
 interface BlockedWarning {
-  stepTitle: string;
-  missing: Checkpoint[];
+  title: string;
+  block: StepBlock;
+}
+
+function warningTitle(block: StepBlock): string {
+  if (block.reason === 'paused') return '组装已暂停';
+  if (block.reason === 'completed-step') return '该步骤已完成';
+  if (block.reason === 'later-step-completed') return '不能撤销该步骤';
+  return '请按顺序组装';
 }
 
 export default function App() {
   const [plan, setPlan] = useState(() => loadPlan() ?? samplePlan);
-  const [progress, setProgress] = useState(() => loadProgress((loadPlan() ?? samplePlan).id));
+  const [progress, setProgress] = useState(() => {
+    const initialPlan = loadPlan() ?? samplePlan;
+    return hydrateProgress(initialPlan, loadProgress(initialPlan.id));
+  });
   const [mode, setMode] = useState<'user' | 'admin'>('user');
   const [view, setView] = useState<'steps' | 'materials'>('steps');
   const [query, setQuery] = useState('');
@@ -37,10 +51,38 @@ export default function App() {
   const stats = overallProgress(plan, progress);
   const visibleSteps = useMemo(() => searchSteps(plan, query), [plan, query]);
 
+  const showBlock = (block: StepBlock | null) => {
+    if (block) setWarning({ title: warningTitle(block), block });
+  };
+
+  const handleAttemptEnter = (step: AssemblyStep) => {
+    showBlock(getStepEntryBlock(plan, step, progress));
+  };
+
+  const handleToggleCheckpoint = (stepId: string, checkpointId: string) => {
+    const step = plan.steps.find((item) => item.id === stepId);
+    if (!step) return;
+    const block = getCheckpointEditBlock(plan, step, progress);
+    if (block) {
+      showBlock(block);
+      return;
+    }
+    setProgress(toggleCheckpoint(progress, stepId, checkpointId));
+  };
+
   const handleCompleteStep = (step: AssemblyStep) => {
-    const result = completeStep(progress, step);
-    if (result.blockedBy.length > 0) {
-      setWarning({ stepTitle: step.title, missing: result.blockedBy });
+    const result = attemptCompleteStep(plan, progress, step);
+    if (result.block) {
+      setWarning({ title: warningTitle(result.block), block: result.block });
+      return;
+    }
+    setProgress(result.progress);
+  };
+
+  const handleUncompleteStep = (stepId: string) => {
+    const result = undoStepCompletion(plan, progress, stepId);
+    if (result.block) {
+      setWarning({ title: warningTitle(result.block), block: result.block });
       return;
     }
     setProgress(result.progress);
@@ -91,8 +133,15 @@ export default function App() {
           </div>
           <span>
             {stats.completed}/{stats.total} 步（{stats.percent}%）
+            {progress.paused && <strong className="paused-label"> · 暂停中</strong>}
           </span>
-          <button type="button" className="btn ghost small" onClick={handleResetProgress}>
+          <button
+            type="button"
+            className="btn ghost small"
+            disabled={progress.paused}
+            title={progress.paused ? '恢复组装后才能清空进度' : undefined}
+            onClick={handleResetProgress}
+          >
             清空进度
           </button>
         </div>
@@ -128,8 +177,8 @@ export default function App() {
               <MissingPartsPanel
                 plan={plan}
                 progress={progress}
-                onResume={() => setProgress(setPaused(progress, false))}
-                onRemoveReport={(id) => setProgress(removeMissingPartReport(progress, id))}
+                onResume={() => setProgress(resumeAssembly(progress))}
+                onMarkReceived={(id) => setProgress(markMissingPartReceived(progress, id))}
               />
             )}
 
@@ -158,13 +207,19 @@ export default function App() {
                   plan={plan}
                   step={step}
                   progress={progress}
-                  onToggleCheckpoint={(stepId, cpId) =>
-                    setProgress(toggleCheckpoint(progress, stepId, cpId))
-                  }
+                  onAttemptEnter={handleAttemptEnter}
+                  onToggleCheckpoint={handleToggleCheckpoint}
                   onCompleteStep={handleCompleteStep}
-                  onUncompleteStep={(stepId) => setProgress(uncompleteStep(progress, stepId))}
+                  onUncompleteStep={handleUncompleteStep}
                   onReportMissing={(partId, qty, note, stepId) =>
-                    setProgress(reportMissingPart(progress, { partId, quantity: qty, note, stepId }))
+                    setProgress(
+                      reportMissingPart(plan, progress, {
+                        partId,
+                        quantity: qty,
+                        note,
+                        stepId,
+                      }),
+                    )
                   }
                 />
               ))
@@ -176,13 +231,20 @@ export default function App() {
       {warning && (
         <div className="modal-backdrop" role="alertdialog" aria-modal="true">
           <div className="modal">
-            <h2>无法完成「{warning.stepTitle}」</h2>
-            <p>以下必需检查点尚未勾选，请先逐项确认：</p>
-            <ul>
-              {warning.missing.map((c) => (
-                <li key={c.id}>{c.text}</li>
-              ))}
-            </ul>
+            <h2>{warning.title}</h2>
+            <p>{describeStepBlock(warning.block)}</p>
+            {warning.block.missing.length > 0 && (
+              <>
+                <p>
+                  步骤「{warning.block.stepTitle}」中以下必需检查点尚未勾选，请先逐项确认：
+                </p>
+                <ul>
+                  {warning.block.missing.map((checkpoint: Checkpoint) => (
+                    <li key={checkpoint.id}>{checkpoint.text}</li>
+                  ))}
+                </ul>
+              </>
+            )}
             <button type="button" className="btn primary" onClick={() => setWarning(null)}>
               返回检查
             </button>

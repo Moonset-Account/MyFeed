@@ -66,6 +66,17 @@ body {
   padding: 20px; margin-bottom: 16px;
 }
 .step-card.is-done { opacity: 0.75; border-color: var(--accent); }
+.step-card.is-locked { background: #fbfaf7; }
+.step-no.step-pending { background: #e9e3d8; color: var(--muted); }
+.badge.locked { color: var(--warn); font-size: 0.8rem; border: 1px solid var(--warn); border-radius: 999px; padding: 2px 10px; }
+.step-lock {
+  border: 1px solid var(--warn); background: #fdf6ec; border-radius: 10px;
+  padding: 10px 12px; margin: 0 0 12px; font-size: 0.88rem;
+}
+.step-lock p { margin: 0 0 6px; }
+.step-lock ul { margin: 6px 0; padding-left: 18px; }
+.step-lock .lock-step { color: var(--warn); font-weight: 600; }
+.paused-label { color: var(--warn); }
 .step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .step-head h3 { margin: 0; font-size: 1.1rem; flex: 1; }
 .step-no {
@@ -114,6 +125,12 @@ body {
 }
 .missing-panel h2 { margin: 0 0 6px; font-size: 1.1rem; color: var(--warn); }
 .missing-panel p { margin: 0 0 10px; font-size: 0.9rem; }
+.missing-panel h3 { margin: 12px 0 6px; font-size: 0.98rem; }
+.resolved-note, .resume-hint { color: var(--accent-dark); font-weight: 600; }
+.part-deleted td { background: #fff8e6; }
+.deleted-note { color: var(--warn); font-size: 0.82rem; margin-left: 4px; }
+.record-status { color: var(--muted); font-size: 0.8rem; margin: 0 6px; }
+.is-resolved .record-status { color: var(--accent-dark); }
 .missing-records { margin: 10px 0; font-size: 0.85rem; }
 .missing-records ul { margin: 8px 0; padding-left: 18px; }
 .missing-records li { margin-bottom: 6px; }

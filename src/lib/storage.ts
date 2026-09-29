@@ -30,7 +30,9 @@ export function loadProgress(planId: string): ProgressState {
       ...createEmptyProgress(planId),
       ...saved,
       checkedCheckpoints: saved.checkedCheckpoints ?? {},
-      missingParts: saved.missingParts ?? [],
+      missingParts: Array.isArray(saved.missingParts)
+        ? saved.missingParts.map((report) => ({ resolvedAt: null, ...report }))
+        : [],
     };
   }
   return createEmptyProgress(planId);
