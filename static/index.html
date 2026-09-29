@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>采收追溯表</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>🍎 采收追溯表</h1>
+    <p>登记采收批次与分装箱号，按箱号追溯来源与库存</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. 登记采收批次</h2>
+      <form id="batch-form">
+        <label>地块 <input name="plot" required maxlength="100" placeholder="如：东坡 3 号地"></label>
+        <label>品种 <input name="variety" required maxlength="100" placeholder="如：红富士"></label>
+        <label>采收日期 <input name="harvest_date" type="date" required></label>
+        <label>采收重量 (kg) <input name="weight_kg" type="number" step="0.001" min="0.001" required></label>
+        <button type="submit">登记批次</button>
+      </form>
+      <p class="msg" id="batch-msg"></p>
+    </section>
+
+    <section class="card">
+      <h2>2. 批次列表与分装</h2>
+      <table id="batch-table">
+        <thead>
+          <tr><th>批次</th><th>地块</th><th>品种</th><th>采收日期</th>
+              <th>采收量(kg)</th><th>已分装(kg)</th><th>剩余库存(kg)</th><th>分装</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <form id="box-form" class="hidden">
+        <h3>为批次 <span id="box-batch-id"></span> 分装（剩余 <span id="box-remaining"></span> kg）</h3>
+        <input type="hidden" name="batch_id">
+        <label>箱号 <input name="box_no" required maxlength="50" placeholder="如：BOX-2026-001"></label>
+        <label>箱重 (kg) <input name="weight_kg" type="number" step="0.001" min="0.001" required></label>
+        <button type="submit">确认分装</button>
+        <button type="button" id="box-cancel">取消</button>
+      </form>
+      <p class="msg" id="box-msg"></p>
+    </section>
+
+    <section class="card">
+      <h2>3. 箱号溯源查询</h2>
+      <form id="trace-form">
+        <label>箱号 <input name="box_no" required placeholder="输入箱号查询来源"></label>
+        <button type="submit">查询</button>
+      </form>
+      <div id="trace-result"></div>
+    </section>
+
+    <section class="card">
+      <h2>4. CSV 导出</h2>
+      <p>导出全部分装记录（箱号、箱重、批次、地块、品种、采收日期、采收量）。</p>
+      <a class="button" href="/api/export.csv" download>下载 CSV</a>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
