@@ -1,0 +1,10 @@
+{
+  "name": "露营装备检查册",
+  "short_name": "装备检查册",
+  "description": "离线维护露营装备、行程分配、归来检查和维修待办。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#2f5d3a",
+  "lang": "zh-CN"
+}
