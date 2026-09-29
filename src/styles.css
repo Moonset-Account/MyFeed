@@ -1,0 +1,137 @@
+:root {
+  color-scheme: light;
+  --accent: #1a6fd4;
+  --danger: #c0392b;
+  --ok: #1e8449;
+  --border: #d5dbe3;
+  --bg: #f5f7fa;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: #222;
+}
+
+.app { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+header h1 { margin: 8px 0 4px; font-size: 24px; }
+
+nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+
+button {
+  padding: 8px 14px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+button.ghost { background: #fff; color: var(--accent); }
+button.active { background: #0d4f9e; }
+button.danger { border-color: var(--danger); color: var(--danger); background: #fff; }
+button:hover { filter: brightness(0.95); }
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+label { display: block; margin: 8px 0; font-size: 14px; }
+input[type='text'], input[type='number'], input:not([type]), textarea, select {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 4px;
+}
+textarea { min-height: 60px; resize: vertical; }
+input[type='checkbox'], input[type='radio'] { width: auto; }
+
+.area-name { font-weight: 600; font-size: 15px; }
+
+.row { display: flex; align-items: center; }
+.row.between { justify-content: space-between; }
+.row.gap { gap: 8px; }
+.row.wrap { flex-wrap: wrap; }
+
+.hint { color: #6b7686; font-size: 13px; }
+.ok { color: var(--ok); font-size: 14px; }
+.error { color: var(--danger); font-size: 14px; }
+
+.violations { color: var(--danger); font-size: 14px; padding-left: 18px; margin: 8px 0 0; }
+
+.badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.sev-low { background: #e8f4ea; color: var(--ok); }
+.sev-medium { background: #fdf3e0; color: #b9770e; }
+.sev-high { background: #fdecea; color: var(--danger); }
+
+.issue.fixed { border-left: 4px solid var(--ok); }
+.issue.open { border-left: 4px solid #b9770e; }
+.issue-detail { border-top: 1px dashed var(--border); margin-top: 10px; padding-top: 10px; }
+
+fieldset { border: 1px solid var(--border); border-radius: 6px; margin: 10px 0; }
+legend { font-size: 13px; color: #6b7686; }
+
+.photo-picker { margin: 10px 0; }
+.photo-label { font-size: 14px; font-weight: 600; }
+.photo-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.photo-grid figure { margin: 0; width: 140px; }
+.photo-grid img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+.photo-grid input { margin: 4px 0; }
+
+.stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.stat {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 18px;
+  text-align: center;
+  min-width: 110px;
+}
+.stat strong { display: block; font-size: 26px; color: var(--accent); }
+.stat span { font-size: 13px; color: #6b7686; }
+
+/* 打印报告 */
+.report-paper { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 28px; }
+.report-header h1 { font-size: 22px; margin: 0 0 8px; }
+.report-area { border-top: 2px solid #333; margin-top: 18px; padding-top: 10px; }
+.report-area h2 { font-size: 17px; margin: 6px 0; }
+.report-issue { border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin: 10px 0; }
+.report-issue h3 { font-size: 15px; margin: 4px 0; }
+.report table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 14px; }
+.report th, .report td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; }
+.report th { background: #f0f3f7; width: 90px; }
+.report-photo-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.report-photo-row figure { margin: 0; }
+.report-photo-row img { width: 150px; height: 110px; object-fit: cover; border: 1px solid var(--border); }
+.report-photo-row figcaption { font-size: 12px; color: #555; }
+.report h4 { margin: 8px 0 4px; font-size: 13px; }
+
+@media print {
+  body { background: #fff; }
+  .no-print, header.no-print, nav { display: none !important; }
+  .app { max-width: none; padding: 0; }
+  .report-paper { border: none; padding: 0; }
+  .report-issue, .report-area { break-inside: avoid; }
+}
