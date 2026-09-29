@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社区服务预约台</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">本地 SQLite · 匿名预约</p>
+      <h1>社区服务预约台</h1>
+      <p class="subtitle">居民凭编号预约、改期或取消；工作人员维护窗口、当天叫号和服务状态。</p>
+    </div>
+    <div class="today-card">
+      <span>今天</span>
+      <strong id="today-date">--</strong>
+      <small id="today-time">--:--</small>
+    </div>
+  </header>
+
+  <main class="shell">
+    <nav class="tabs" aria-label="功能切换">
+      <button class="tab active" data-tab="resident">居民预约</button>
+      <button class="tab" data-tab="staff">窗口配置</button>
+      <button class="tab" data-tab="dashboard">当天叫号</button>
+    </nav>
+
+    <section id="resident" class="tab-panel active">
+      <div class="grid two">
+        <article class="card">
+          <h2>选择窗口和空档</h2>
+          <form id="booking-form" class="form-stack">
+            <label>服务窗口
+              <select id="booking-window" required></select>
+            </label>
+            <label>预约日期
+              <input id="booking-date" type="date" required>
+            </label>
+            <label>可选备注（不会用于身份校验）
+              <input id="booking-note" maxlength="200" placeholder="例如：需要老花镜，可留空">
+            </label>
+            <div id="slots-wrap" class="slots-grid empty">
+              <p>请先选择窗口和日期。</p>
+            </div>
+            <button type="submit" class="primary">预约选中的空档</button>
+          </form>
+          <div id="booking-result" class="notice hidden" role="status"></div>
+        </article>
+
+        <article class="card">
+          <h2>凭匿名编号改期或取消</h2>
+          <form id="lookup-form" class="inline-form">
+            <input id="lookup-reference" maxlength="6" placeholder="6 位编号" required>
+            <button type="submit">查询</button>
+          </form>
+          <div id="appointment-detail" class="detail-empty">输入预约后获得的 6 位编号查询。</div>
+
+          <div id="manage-area" class="hidden form-stack">
+            <h3>改期到新空档</h3>
+            <label>服务窗口
+              <select id="reschedule-window"></select>
+            </label>
+            <label>日期
+              <input id="reschedule-date" type="date">
+            </label>
+            <label>空档
+              <select id="reschedule-slot"></select>
+            </label>
+            <div class="button-row">
+              <button id="reschedule-btn" type="button" class="primary">确认改期</button>
+              <button id="cancel-booking-btn" type="button" class="danger">取消预约</button>
+            </div>
+          </div>
+          <div id="resident-message" class="notice hidden" role="status"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="staff" class="tab-panel">
+      <div class="grid two wide-left">
+        <article class="card">
+          <h2>服务窗口</h2>
+          <form id="window-form" class="form-grid">
+            <label>窗口名称
+              <input id="window-name" maxlength="50" placeholder="如：一号窗口" required>
+            </label>
+            <label>服务内容
+              <input id="window-service" maxlength="80" placeholder="如：社保咨询" required>
+            </label>
+            <label>单次时长（分钟）
+              <input id="window-duration" type="number" min="5" max="240" step="5" value="20" required>
+            </label>
+            <label class="checkbox-label">
+              <input id="window-active" type="checkbox" checked> 立即启用
+            </label>
+            <button class="primary" type="submit">新增窗口</button>
+          </form>
+          <div id="window-message" class="notice hidden"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>窗口</th><th>服务</th><th>时长</th><th>状态</th><th>操作</th></tr></thead>
+              <tbody id="windows-table"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>每日可预约时段</h2>
+          <form id="schedule-form" class="form-grid">
+            <label>窗口
+              <select id="schedule-window" required></select>
+            </label>
+            <label>日期
+              <input id="schedule-date" type="date" required>
+            </label>
+            <label>开放开始
+              <input id="schedule-open" type="time" value="09:00" required>
+            </label>
+            <label>开放结束
+              <input id="schedule-close" type="time" value="11:00" required>
+            </label>
+            <button class="primary" type="submit">保存每日时段</button>
+          </form>
+          <div id="schedule-message" class="notice hidden"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>日期</th><th>窗口</th><th>时间</th><th>操作</th></tr></thead>
+              <tbody id="schedules-table"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="dashboard" class="tab-panel">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>当天叫号列表与空档</h2>
+            <p>迟到和爽约只记录状态，不产生自动惩罚或封禁。</p>
+          </div>
+          <form class="inline-form">
+            <input id="dashboard-date" type="date">
+            <button id="dashboard-refresh" type="button">刷新</button>
+          </form>
+        </div>
+        <div id="dashboard-summary" class="summary-row"></div>
+        <div id="dashboard-content"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="edit-schedule-dialog">
+    <form id="edit-schedule-form" method="dialog" class="dialog-form">
+      <h3>修改开放时间</h3>
+      <p id="edit-schedule-title"></p>
+      <label>开放开始<input id="edit-open" type="time" required></label>
+      <label>开放结束<input id="edit-close" type="time" required></label>
+      <div class="button-row">
+        <button value="cancel">取消</button>
+        <button id="save-schedule-edit" class="primary" value="default">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
