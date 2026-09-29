@@ -1,0 +1,25 @@
+{
+  "name": "openapi-contract-review",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/setup-local.mjs",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && npm run check:python",
+    "check:python": "node scripts/check-python.mjs",
+    "test": ".venv/bin/python -m pytest",
+    "test:watch": "vitest --watch"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "vite": "6.0.7",
+    "typescript": "5.7.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5"
+  }
+}

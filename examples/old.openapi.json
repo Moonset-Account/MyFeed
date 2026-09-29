@@ -1,0 +1,60 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Orders API",
+    "version": "1.0.0",
+    "description": "旧服务。仅 description 变化不应产生兼容性结论。"
+  },
+  "paths": {
+    "/orders/{id}": {
+      "get": {
+        "description": "旧操作说明",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "$ref": "#/components/schemas/OrderId" }
+          },
+          {
+            "name": "delivery",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "enum": ["standard", "express"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "旧响应说明",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Order" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "OrderId": { "type": "string", "description": "订单 ID" },
+      "Order": {
+        "type": "object",
+        "required": ["id", "state", "customer"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/OrderId" },
+          "state": { "type": "string", "enum": ["new", "paid", "cancelled"] },
+          "customer": { "$ref": "#/components/schemas/Customer" }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" }
+        }
+      }
+    }
+  }
+}
