@@ -1,0 +1,22 @@
+{
+  "name": "openapi-contract-review",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && .venv/bin/python -m compileall -q backend && .venv/bin/python -c 'import backend.app'",
+    "test": "npm run build && .venv/bin/python -m pytest -q",
+    "postinstall": "if [ ! -x .venv/bin/python ]; then python3 -m venv .venv; fi && .venv/bin/python -m pip install -r requirements.txt"
+  },
+  "dependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.1"
+  },
+  "devDependencies": {}
+}
