@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>社区服务预约台</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Community Service Desk</p>
+      <h1>社区服务预约台</h1>
+      <p class="subtitle">本地 SQLite 存储 · 匿名编号预约 · 工作人员叫号管理</p>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="功能切换">
+    <button class="tab active" data-tab="resident" type="button">居民预约</button>
+    <button class="tab" data-tab="staff" type="button">工作台</button>
+  </nav>
+
+  <main>
+    <section id="resident" class="panel active">
+      <div class="grid two-columns">
+        <article class="card">
+          <h2>预约服务</h2>
+          <p class="hint">请记住自己的匿名编号，后续凭它改期或取消。</p>
+          <form id="booking-form" class="form-stack">
+            <label>匿名编号
+              <input name="resident_code" required minlength="2" maxlength="24" placeholder="例如 JM-2026-018">
+            </label>
+            <label>预约日期
+              <input type="date" name="date" required>
+            </label>
+            <label>服务窗口
+              <select name="window_id" required></select>
+            </label>
+            <label>可预约空档
+              <select name="start_time" required>
+                <option value="">请先选择窗口和日期</option>
+              </select>
+            </label>
+            <button type="submit" class="primary">确认预约</button>
+          </form>
+          <div id="booking-result" class="result" aria-live="polite"></div>
+        </article>
+
+        <article class="card">
+          <h2>我的预约</h2>
+          <form id="lookup-form" class="inline-form">
+            <input name="resident_code" required minlength="2" maxlength="24" placeholder="输入匿名编号">
+            <button type="submit">查询</button>
+          </form>
+          <div id="my-appointments" class="appointment-list" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="staff" class="panel">
+      <div class="card">
+        <div class="section-title">
+          <div>
+            <h2>当天叫号与空档</h2>
+            <p class="hint">迟到和爽约只更新预约状态，不产生自动惩罚。</p>
+          </div>
+          <form id="day-form" class="inline-form">
+            <input type="date" name="date" required>
+            <button type="submit">刷新</button>
+          </form>
+        </div>
+        <div id="day-summary" class="summary-grid"></div>
+      </div>
+
+      <div class="grid two-columns wide-left">
+        <article class="card">
+          <h2>叫号列表</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>号码</th>
+                  <th>时间</th>
+                  <th>窗口 / 服务</th>
+                  <th>状态</th>
+                  <th>登记</th>
+                </tr>
+              </thead>
+              <tbody id="queue-body"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>空档</h2>
+          <div id="gaps" class="gap-list"></div>
+        </article>
+      </div>
+
+      <div class="grid two-columns">
+        <article class="card">
+          <h2 id="window-form-title">新增服务窗口</h2>
+          <form id="window-form" class="form-stack">
+            <input type="hidden" name="window_id">
+            <label>窗口名称
+              <input name="name" required maxlength="30" placeholder="例如 一号窗口">
+            </label>
+            <label>服务名称
+              <input name="service_name" required maxlength="60" placeholder="例如 社保咨询">
+            </label>
+            <div class="form-row">
+              <label>单次服务时长（分钟）
+                <input type="number" name="duration_minutes" min="5" max="240" step="5" value="20" required>
+              </label>
+              <label>启用
+                <select name="is_active">
+                  <option value="true">启用</option>
+                  <option value="false">停用</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-row">
+              <label>开放开始
+                <input type="time" name="open_time" value="09:00" required>
+              </label>
+              <label>开放结束
+                <input type="time" name="close_time" value="12:00" required>
+              </label>
+            </div>
+            <div class="button-row">
+              <button type="submit" class="primary">保存窗口</button>
+              <button type="button" id="cancel-edit" class="secondary hidden">取消编辑</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>窗口配置</h2>
+          <div id="window-list" class="window-list"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
