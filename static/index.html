@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>客房清扫看板</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">小民宿前台 · 清扫协同</p>
+      <h1>客房清扫看板</h1>
+    </div>
+    <div class="date-picker">
+      <label for="boardDate">看板日期</label>
+      <input id="boardDate" type="date">
+      <button id="refreshBtn" class="secondary" type="button">刷新</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="primary-column">
+      <section class="stats-grid" id="statsGrid" aria-label="今日概览"></section>
+
+      <section class="panel">
+        <div class="panel-title">
+          <div><h2>当日优先顺序</h2><p>返工优先，随后按超时退房时间排序</p></div>
+        </div>
+        <div id="taskQueue" class="task-list"></div>
+      </section>
+
+      <section class="panel panel-soft">
+        <div class="panel-title">
+          <div><h2>当日已完成</h2><p>复查通过并确认后，房间才进入空房可入住</p></div>
+        </div>
+        <div id="finishedList" class="finished-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title"><div><h2>用品补充记录</h2><p id="supplyDayHint"></p></div></div>
+        <form id="supplyForm" class="supply-form">
+          <select name="room_id" id="supplyRoom"></select>
+          <select name="supply_item_id" id="supplyItem" required></select>
+          <input name="quantity" type="number" min="1" value="1" required aria-label="数量">
+          <input name="note" type="text" maxlength="200" placeholder="备注，如补到洗手台">
+          <button type="submit">登记补充</button>
+        </form>
+        <div id="supplyList" class="supply-list"></div>
+      </section>
+    </section>
+
+    <aside class="side-column">
+      <section class="panel">
+        <h2>登记房间</h2>
+        <form id="roomForm" class="stack-form">
+          <input name="name" required maxlength="30" placeholder="房号，如 201">
+          <input name="floor" maxlength="30" placeholder="楼层/区域，如 二楼">
+          <textarea name="note" maxlength="200" placeholder="房间备注"></textarea>
+          <details>
+            <summary>自定义检查项（每行一项）</summary>
+            <textarea name="checklist" rows="6" placeholder="留空使用默认检查项"></textarea>
+          </details>
+          <button type="submit">新增房间</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>登记退房任务</h2>
+        <form id="taskForm" class="stack-form">
+          <select name="room_id" id="taskRoom" required></select>
+          <input name="checkout_at" id="checkoutAt" type="datetime-local" required>
+          <select name="cleaner_id" id="taskCleaner">
+            <option value="">到点后再分配</option>
+          </select>
+          <button type="submit">登记退房时间</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>清扫人员</h2>
+        <form id="cleanerForm" class="inline-form">
+          <input name="name" required maxlength="30" placeholder="姓名">
+          <button type="submit">新增</button>
+        </form>
+        <div id="cleanerList" class="chips"></div>
+      </section>
+
+      <section class="panel">
+        <h2>房间状态与历史</h2>
+        <div id="roomList" class="room-list"></div>
+      </section>
+    </aside>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle"></h2>
+        <button id="modalClose" class="icon-btn" type="button" aria-label="关闭">×</button>
+      </div>
+      <div id="modalBody"></div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
