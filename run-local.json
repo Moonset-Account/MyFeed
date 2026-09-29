@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "runtimes": [
+    "node",
+    "python"
+  ],
+  "web_service": "web",
+  "services": [
+    {
+      "name": "api",
+      "command": [
+        "{venv_python}",
+        "-m",
+        "uvicorn",
+        "backend.app:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "{port}"
+      ],
+      "cwd": ".",
+      "ready_path": "/health",
+      "env": {},
+      "ready_json": {
+        "status": "ok"
+      }
+    },
+    {
+      "name": "web",
+      "command": [
+        "npm",
+        "run",
+        "dev",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "{port}",
+        "--strictPort"
+      ],
+      "cwd": ".",
+      "ready_path": "/",
+      "env": {
+        "VITE_API_BASE_URL": "http://127.0.0.1:{port:api}"
+      }
+    }
+  ]
+}
+
