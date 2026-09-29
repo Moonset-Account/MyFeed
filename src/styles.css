@@ -1,0 +1,160 @@
+:root {
+  color-scheme: light;
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #faf6f0;
+  color: #3a2e25;
+}
+
+.page {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 8px 16px;
+  border: 1px solid #d8c9b8;
+  background: #fff;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.tab.active {
+  background: #8b5e34;
+  border-color: #8b5e34;
+  color: #fff;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e6dbcd;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 520px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+section > label {
+  max-width: 220px;
+  margin-bottom: 16px;
+}
+
+input {
+  padding: 8px 10px;
+  border: 1px solid #d8c9b8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+fieldset {
+  border: 1px solid #e6dbcd;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.product-row input {
+  width: 90px;
+}
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #8b5e34;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+button.danger {
+  background: #b3402e;
+  margin-left: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee2d3;
+  font-size: 0.9rem;
+  vertical-align: top;
+}
+
+th {
+  background: #f3ead9;
+}
+
+.error {
+  color: #b3402e;
+}
+
+.muted {
+  color: #9a8874;
+  font-size: 0.8rem;
+}
+
+.status-cancelled td {
+  color: #9a8874;
+  text-decoration: line-through;
+}
+
+.status-cancelled td:last-child {
+  text-decoration: none;
+}
