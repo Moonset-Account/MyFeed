@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>采收追溯表</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">果园采收管理</p>
+          <h1>采收追溯表</h1>
+          <p class="subtitle">登记采收批次和分装箱号，按箱追溯地块、品种和剩余库存。</p>
+        </div>
+        <a class="button secondary" href="/api/export.csv" id="exportAll">导出全部 CSV</a>
+      </header>
+
+      <section class="card" aria-labelledby="register-title">
+        <h2 id="register-title">登记采收批次</h2>
+        <form id="batchForm">
+          <div class="grid four">
+            <label>
+              地块
+              <input type="text" id="parcel" name="parcel" maxlength="100" placeholder="例如：东坡 3 号" required />
+            </label>
+            <label>
+              品种
+              <input type="text" id="variety" name="variety" maxlength="100" placeholder="例如：红富士" required />
+            </label>
+            <label>
+              采收日期
+              <input type="date" id="harvestDate" name="harvest_date" required />
+            </label>
+            <label>
+              采收重量（kg）
+              <input type="number" id="weightKg" name="weight_kg" min="0.001" step="0.001" required />
+            </label>
+          </div>
+
+          <div class="boxes-header">
+            <div>
+              <h3>分装箱号</h3>
+              <p>同一箱号不能属于两个批次；分装总重不能超过采收重量。</p>
+            </div>
+            <button type="button" class="button secondary" id="addBox">添加箱号</button>
+          </div>
+
+          <div id="boxRows" class="box-rows"></div>
+          <p class="total-line">分装合计：<strong id="packedTotal">0</strong> kg / 采收量 <strong id="harvestTotal">0</strong> kg</p>
+
+          <div class="form-actions">
+            <button type="submit" class="button primary">保存批次</button>
+          </div>
+          <p class="message" id="formMessage" role="status"></p>
+        </form>
+      </section>
+
+      <section class="grid two-columns">
+        <div class="card" aria-labelledby="lookup-title">
+          <h2 id="lookup-title">按箱号查询来源</h2>
+          <form id="lookupForm" class="lookup-row">
+            <input type="search" id="lookupCode" placeholder="输入箱号，例如 A-001" maxlength="64" required />
+            <button type="submit" class="button primary">查询</button>
+          </form>
+          <p class="message" id="lookupMessage" role="status"></p>
+          <dl id="boxResult" class="result-list" hidden></dl>
+          <a class="button secondary export-lookup hidden" id="exportLookup" href="/api/export.csv">导出该箱 CSV</a>
+        </div>
+
+        <div class="card" aria-labelledby="batches-title">
+          <div class="section-header">
+            <h2 id="batches-title">已登记批次</h2>
+            <button type="button" class="button secondary" id="refreshBatches">刷新</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>地块</th>
+                  <th>品种</th>
+                  <th>日期</th>
+                  <th>采收量</th>
+                  <th>已分装</th>
+                  <th>剩余库存</th>
+                  <th>箱号</th>
+                </tr>
+              </thead>
+              <tbody id="batchTable">
+                <tr><td colspan="8" class="muted">暂无数据</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local virtual environment
+.venv/
+
+# Local SQLite runtime data
+*.db
+*.db-shm
+*.db-wal
+
+# macOS and editor files
+.DS_Store
+.idea/
+.vscode/
