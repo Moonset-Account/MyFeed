@@ -1,0 +1,71 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f4f5f7;
+  color: #222;
+}
+header {
+  background: #1f3a5f;
+  color: #fff;
+  padding: 16px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 16px;
+}
+header h1 { font-size: 20px; margin: 0; }
+.summary { font-size: 14px; opacity: 0.9; }
+main { max-width: 960px; margin: 0 auto; padding: 16px; }
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.card h2 { font-size: 16px; margin: 0 0 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+input[type="text"], input[type="number"], textarea {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+textarea { width: 100%; font-family: monospace; }
+button, .button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #1f3a5f;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button:hover, .button:hover { background: #2a4f80; }
+button.danger { background: #b03a2e; }
+button.danger:hover { background: #cb4335; }
+button.tab { background: #e2e6ec; color: #333; }
+button.tab.active { background: #1f3a5f; color: #fff; }
+.hint { font-size: 12px; color: #777; margin: 4px 0 0; }
+.feedback { font-size: 14px; min-height: 20px; }
+.feedback.ok { color: #1e8449; }
+.feedback.err { color: #b03a2e; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 8px; }
+th, td { border: 1px solid #e0e0e0; padding: 6px 8px; text-align: left; }
+th { background: #f0f2f5; }
+tr.diff-pos td.diff { color: #b03a2e; font-weight: 600; }
+tr.diff-neg td.diff { color: #b03a2e; font-weight: 600; }
+tr.uncounted td { color: #999; }
+.group-title { font-weight: 600; margin: 12px 0 4px; }
+.group-meta { font-size: 12px; color: #666; margin-bottom: 4px; }
+.reason-input { width: 140px; padding: 4px 6px; font-size: 12px; }
+dialog {
+  border: none;
+  border-radius: 8px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+dialog::backdrop { background: rgba(0,0,0,0.35); }

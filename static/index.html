@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>盘点差异助手</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>盘点差异助手</h1>
+    <div id="summary" class="summary"></div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. 导入商品清单</h2>
+      <div class="row">
+        <input type="file" id="csv-file" accept=".csv,text/csv">
+        <button id="btn-sample">载入样例数据</button>
+        <button id="btn-reset" class="danger">清空重新开始</button>
+      </div>
+      <details>
+        <summary>或粘贴 CSV 文本</summary>
+        <textarea id="csv-text" rows="5" placeholder="货号,名称,类别,货架,账面数量&#10;A001,可口可乐330ml,饮料,A架,24"></textarea>
+        <button id="btn-import-text">导入粘贴内容</button>
+      </details>
+      <p class="hint">CSV 表头需包含：货号、名称、类别、货架、账面数量（也支持 sku/name/category/shelf/system_qty）。导入会清空当前盘点。</p>
+    </section>
+
+    <section class="card">
+      <h2>2. 录入实盘数量</h2>
+      <div class="row">
+        <input type="text" id="scan-sku" placeholder="扫码或输入货号" autocomplete="off">
+        <input type="number" id="scan-qty" min="0" step="1" placeholder="实盘数量">
+        <button id="btn-count">录入</button>
+      </div>
+      <p class="hint">扫码枪回车即提交：先扫货号，再填数量回车。重复扫码会提示确认，不会悄悄覆盖。</p>
+      <div id="count-feedback" class="feedback"></div>
+    </section>
+
+    <section class="card">
+      <h2>3. 账实差异</h2>
+      <div class="row tabs">
+        <button class="tab active" data-by="shelf">按货架</button>
+        <button class="tab" data-by="category">按类别</button>
+      </div>
+      <div id="diff-view"></div>
+    </section>
+
+    <section class="card">
+      <h2>4. 复盘表</h2>
+      <div class="row">
+        <button id="btn-refresh-review">刷新复盘表</button>
+        <a class="button" href="/api/export/counts" download>导出盘点 CSV</a>
+        <a class="button" href="/api/export/review" download>导出复盘 CSV</a>
+      </div>
+      <div id="review-view"></div>
+    </section>
+  </main>
+
+  <dialog id="conflict-dialog">
+    <p id="conflict-msg"></p>
+    <div class="row">
+      <button id="conflict-ok" class="danger">覆盖为新数量</button>
+      <button id="conflict-cancel">保留原数量</button>
+    </div>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
