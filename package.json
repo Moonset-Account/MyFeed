@@ -1,0 +1,22 @@
+{
+  "name": "banquet-seating-chart",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "宴席座位安排图：纯本地运行的宴席排位工具",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.1.0",
+    "svelte": "^5.28.1",
+    "svelte-check": "^4.1.5",
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0",
+    "vitest": "^3.2.4"
+  }
+}
