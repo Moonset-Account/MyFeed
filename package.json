@@ -1,0 +1,30 @@
+{
+  "name": "bakery-preorders",
+  "version": "1.0.0",
+  "private": true,
+  "description": "小烘焙店预订出炉安排：配方、每日原料、烤箱时段、预订与制作清单",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "tsx server/index.ts",
+    "build": "tsc -p tsconfig.server.json && tsc --noEmit -p tsconfig.json && vite build",
+    "start": "node dist/server/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
+  },
+  "type": "module"
+}
