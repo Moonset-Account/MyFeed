@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>盘点差异助手</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>盘点差异助手</h1>
+    <p class="subtitle">导入商品清单 → 录入实盘 → 查看账实差异 → 记录原因 → 生成复盘表</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="import">① 商品清单</button>
+    <button class="tab" data-tab="count">② 盘点录入</button>
+    <button class="tab" data-tab="diff">③ 差异查看</button>
+    <button class="tab" data-tab="review">④ 复盘表</button>
+  </nav>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <main>
+    <!-- ① 商品清单 -->
+    <section id="tab-import" class="panel">
+      <div class="card">
+        <h2>导入商品清单（CSV）</h2>
+        <p>CSV 需含表头：<code>sku,name,category,shelf,book_qty</code>（UTF-8 编码）。导入会开启新一轮盘点并清空旧数据。</p>
+        <div class="row">
+          <input type="file" id="csv-file" accept=".csv">
+          <button id="btn-import">导入 CSV</button>
+          <button id="btn-sample" class="secondary">载入内置样例</button>
+          <a href="/api/sample.csv" download><button class="secondary">下载样例 CSV</button></a>
+          <button id="btn-reset" class="danger">清空全部数据</button>
+        </div>
+        <p id="import-status" class="muted"></p>
+      </div>
+      <div class="card">
+        <h2>当前清单 <span id="items-count" class="badge"></span></h2>
+        <div class="table-wrap">
+          <table id="items-table">
+            <thead><tr><th>SKU</th><th>名称</th><th>类别</th><th>货架</th><th>账面数量</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ② 盘点录入 -->
+    <section id="tab-count" class="panel hidden">
+      <div class="card">
+        <h2>扫码 / 录入实盘数量</h2>
+        <p>扫描枪或手工输入 SKU 后回车，再输入实盘数量回车提交。重复录入同一商品时<strong>不会悄悄覆盖</strong>，需确认后才改写。</p>
+        <div class="row">
+          <input type="text" id="scan-sku" placeholder="SKU / 条码" autocomplete="off">
+          <input type="number" id="scan-qty" placeholder="实盘数量" min="0" step="1">
+          <button id="btn-count">录入</button>
+        </div>
+        <div id="overwrite-box" class="overwrite hidden">
+          <span id="overwrite-text"></span>
+          <button id="btn-overwrite-yes" class="danger">确认覆盖</button>
+          <button id="btn-overwrite-no" class="secondary">取消</button>
+        </div>
+        <div class="progress"><div id="progress-bar"></div></div>
+        <p id="progress-text" class="muted"></p>
+      </div>
+      <div class="card">
+        <h2>录入进度</h2>
+        <div class="table-wrap">
+          <table id="count-table">
+            <thead><tr><th>SKU</th><th>名称</th><th>货架</th><th>账面</th><th>实盘</th><th>差异</th><th>录入时间</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ 差异查看 -->
+    <section id="tab-diff" class="panel hidden">
+      <div class="card">
+        <h2>按货架与类别查看账实差异</h2>
+        <div class="row">
+          <label>货架 <select id="filter-shelf"><option value="">全部</option></select></label>
+          <label>类别 <select id="filter-category"><option value="">全部</option></select></label>
+          <label><input type="checkbox" id="filter-only-diff"> 只看有差异</label>
+        </div>
+        <h3>按货架汇总</h3>
+        <div class="table-wrap"><table id="shelf-table">
+          <thead><tr><th>货架</th><th>商品数</th><th>已盘</th><th>账面合计</th><th>实盘合计</th><th>差异合计</th><th>差异商品数</th></tr></thead>
+          <tbody></tbody></table></div>
+        <h3>按类别汇总</h3>
+        <div class="table-wrap"><table id="category-table">
+          <thead><tr><th>类别</th><th>商品数</th><th>已盘</th><th>账面合计</th><th>实盘合计</th><th>差异合计</th><th>差异商品数</th></tr></thead>
+          <tbody></tbody></table></div>
+        <h3>明细（点击行可登记差异原因）</h3>
+        <div class="table-wrap"><table id="diff-table">
+          <thead><tr><th>SKU</th><th>名称</th><th>类别</th><th>货架</th><th>账面</th><th>实盘</th><th>差异</th><th>原因</th></tr></thead>
+          <tbody></tbody></table></div>
+      </div>
+      <div id="reason-dialog" class="card hidden">
+        <h2>登记差异原因：<span id="reason-sku"></span></h2>
+        <div class="row">
+          <select id="reason-select"></select>
+          <input type="text" id="reason-note" placeholder="备注（可选）">
+          <button id="btn-reason-save">保存</button>
+          <button id="btn-reason-cancel" class="secondary">取消</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ 复盘表 -->
+    <section id="tab-review" class="panel hidden">
+      <div class="card">
+        <h2>复盘表</h2>
+        <p id="review-summary" class="muted"></p>
+        <div class="row">
+          <a href="/api/export/review.csv" download><button>导出复盘表 CSV</button></a>
+          <a href="/api/export/counts.csv" download><button class="secondary">导出全部盘点结果 CSV</button></a>
+        </div>
+        <div class="table-wrap"><table id="review-table">
+          <thead><tr><th>SKU</th><th>名称</th><th>类别</th><th>货架</th><th>账面</th><th>实盘</th><th>差异</th><th>原因</th><th>备注</th></tr></thead>
+          <tbody></tbody></table></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
