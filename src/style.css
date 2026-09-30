@@ -188,7 +188,9 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .form-card button { margin-top: auto; }
 .absence-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
 .absence-list li { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .88rem; color: #334155; }
-.absence-list button, .course-pill button { border: 0; background: transparent; color: var(--danger); padding: 4px; font-weight: 700; }
+.absence-list button, .link-button { border: 0; background: transparent; color: var(--primary); padding: 4px; font-weight: 700; }
+.link-button.danger, .absence-list button { color: var(--danger); }
+.link-button:hover { text-decoration: underline; }
 
 .course-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
 .course-pill {
@@ -202,6 +204,18 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 }
 .course-pill strong, .course-pill small { display: block; }
 .course-pill small { margin-top: 3px; color: var(--muted); line-height: 1.4; }
+.course-pill__actions { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+
+.exam-edit { display: grid; gap: 8px; margin-top: 6px; }
+.exam-edit label { display: grid; gap: 4px; font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.exam-edit input {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+.exam-edit__actions { display: flex; gap: 8px; }
+.exam-edit__hint { margin: 0; font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
 
 .chapter-grid {
   display: grid;

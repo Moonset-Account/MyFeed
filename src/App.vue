@@ -4,6 +4,7 @@ import ChapterCard from './components/ChapterCard.vue'
 import ProgressChart from './components/ProgressChart.vue'
 import WeekPlan from './components/WeekPlan.vue'
 import { addDays, formatCN, todayISO } from './lib/dates'
+import { applyCompletion, rescheduleCourse, undoLastCompletion } from './lib/mutations'
 import { buildDayPlan, buildStudyPlan, buildWeekPlan, getChapterViews, getCourseStats } from './lib/planning'
 import { clearSavedState, createId, loadState, saveState } from './lib/storage'
 import type { Absence, Course, PlannerState, Proficiency } from './lib/types'
@@ -27,6 +28,11 @@ const chapterForm = reactive({
 const absenceForm = reactive({
   date: addDays(today, 1),
   reason: '',
+})
+
+const examEdit = reactive({
+  courseId: '',
+  date: '',
 })
 
 const plan = computed(() => buildStudyPlan(state, today))
@@ -99,23 +105,32 @@ function removeChapter(chapterId: string) {
 }
 
 function completeChapter(chapterId: string) {
-  const chapter = state.chapters.find((item) => item.id === chapterId)
-  if (!chapter) return
-  state.records.push({
-    id: createId('record'),
-    chapterId,
-    courseId: chapter.courseId,
-    date: today,
-    units: 1,
-    createdAt: new Date().toISOString(),
-  })
+  applyCompletion(state, chapterId, today)
 }
 
 function undoChapter(chapterId: string) {
-  const index = [...state.records].reverse().findIndex((record) => record.chapterId === chapterId)
-  if (index === -1) return
-  const actualIndex = state.records.length - 1 - index
-  state.records.splice(actualIndex, 1)
+  undoLastCompletion(state, chapterId)
+}
+
+function startExamEdit(course: Course) {
+  examEdit.courseId = course.id
+  examEdit.date = course.examDate
+}
+
+function cancelExamEdit() {
+  examEdit.courseId = ''
+  examEdit.date = ''
+}
+
+function confirmExamEdit(courseId: string) {
+  if (examEdit.courseId !== courseId || !examEdit.date) return
+  const course = state.courses.find((item) => item.id === courseId)
+  if (!course || course.examDate === examEdit.date) {
+    cancelExamEdit()
+    return
+  }
+  rescheduleCourse(state, courseId, examEdit.date)
+  cancelExamEdit()
 }
 
 function updateProficiency(chapterId: string, proficiency: Proficiency) {
@@ -284,9 +299,30 @@ function printWeek() {
           <span class="color-dot" :style="{ background: stat.course.color }"></span>
           <div>
             <strong>{{ stat.course.name }}</strong>
-            <small>{{ formatCN(stat.course.examDate) }} · {{ stat.chapterCount }} 章 · 完成 {{ stat.completedUnits }}/{{ stat.totalUnits }} 块</small>
+            <small v-if="examEdit.courseId !== stat.course.id">
+              {{ formatCN(stat.course.examDate) }} · {{ stat.chapterCount }} 章 · 完成 {{ stat.completedUnits }}/{{ stat.totalUnits }} 块
+            </small>
+            <div v-else class="exam-edit">
+              <label>
+                新考试日期
+                <input v-model="examEdit.date" type="date" :min="today" :aria-label="`${stat.course.name} 新的考试日期`" />
+              </label>
+              <div class="exam-edit__actions">
+                <button class="primary-button small" type="button" :disabled="!examEdit.date" @click="confirmExamEdit(stat.course.id)">确认改期</button>
+                <button class="secondary-button small" type="button" @click="cancelExamEdit">取消</button>
+              </div>
+              <p class="exam-edit__hint">确认后只按新的剩余天数重算未完成复习块；已完成记录、熟练度和缺席日都会保留。</p>
+            </div>
           </div>
-          <button type="button" @click="removeCourse(stat.course.id)">删除</button>
+          <div class="course-pill__actions">
+            <button
+              v-if="examEdit.courseId !== stat.course.id"
+              class="link-button"
+              type="button"
+              @click="startExamEdit(stat.course)"
+            >改期</button>
+            <button class="link-button danger" type="button" @click="removeCourse(stat.course.id)">删除</button>
+          </div>
         </article>
       </div>
       <p v-else class="empty-inline">还没有课程，先添加一门考试课程。</p>

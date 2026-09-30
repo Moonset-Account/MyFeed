@@ -115,6 +115,29 @@ function normalizeState(value: Partial<PlannerState> | null | undefined): Planne
         }))
     : fallback.absences
 
+  // 统一完成量数据来源：复习记录是唯一事实来源。
+  // 兼容旧版本地数据：章节上的 completedUnits 若超出记录合计，
+  // 补一条迁移记录，保证既有进度不丢失且可以继续撤销。
+  const completedByChapter = new Map<string, number>()
+  for (const record of records) {
+    completedByChapter.set(record.chapterId, (completedByChapter.get(record.chapterId) ?? 0) + record.units)
+  }
+  for (const chapter of chapters) {
+    const recorded = completedByChapter.get(chapter.id) ?? 0
+    if (chapter.completedUnits > recorded) {
+      records.push({
+        id: `record-migrated-${chapter.id}`,
+        chapterId: chapter.id,
+        courseId: chapter.courseId,
+        date: todayISO(),
+        units: chapter.completedUnits - recorded,
+        createdAt: new Date().toISOString(),
+      })
+      completedByChapter.set(chapter.id, chapter.completedUnits)
+    }
+    chapter.completedUnits = completedByChapter.get(chapter.id) ?? 0
+  }
+
   return { version: 1, courses, chapters, records, absences }
 }
 

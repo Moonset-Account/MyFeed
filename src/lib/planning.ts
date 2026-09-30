@@ -65,7 +65,7 @@ export function getChapterViews(state: PlannerState, today = todayISO()): Chapte
   const courseMap = new Map(state.courses.map((course) => [course.id, course]))
   return state.chapters
     .map((chapter) => {
-      const completed = Math.max(chapter.completedUnits, completedOn(state, chapter.id))
+      const completed = completedOn(state, chapter.id)
       return createChapterView(chapter, completed, courseMap.get(chapter.courseId))
     })
     .filter((view) => {
