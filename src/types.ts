@@ -48,6 +48,10 @@ export interface AssemblyPlan {
 export interface MissingPartReport {
   id: string;
   partId: string;
+  /** 登记时的零件信息快照：即使管理员之后从方案中删除该零件，补件记录仍可读 */
+  partCode?: string;
+  partName?: string;
+  partUnit?: string;
   quantity: number;
   note: string;
   stepId: string | null;

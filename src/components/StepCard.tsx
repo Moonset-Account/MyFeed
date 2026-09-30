@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { AssemblyPlan, AssemblyStep, ProgressState } from '../types';
-import { isStepCompleted } from '../lib/assembly';
+import { incompleteEarlierSteps, isStepCompleted } from '../lib/assembly';
 import { Illustration } from './Illustration';
 
 interface StepCardProps {
@@ -26,6 +26,7 @@ export function StepCard({
 }: StepCardProps) {
   const completed = isStepCompleted(step.id, progress);
   const checked = new Set(progress.checkedCheckpoints[step.id] ?? []);
+  const earlierBlockers = completed ? [] : incompleteEarlierSteps(plan, progress, step.id);
   const [missingOpen, setMissingOpen] = useState(false);
   const [missingPartId, setMissingPartId] = useState(step.parts[0]?.partId ?? plan.parts[0]?.id ?? '');
   const [missingQty, setMissingQty] = useState(1);
@@ -88,7 +89,7 @@ export function StepCard({
                 <input
                   type="checkbox"
                   checked={checked.has(c.id)}
-                  disabled={progress.paused && !completed}
+                  disabled={progress.paused}
                   onChange={() => onToggleCheckpoint(step.id, c.id)}
                 />
                 <span>
@@ -99,6 +100,16 @@ export function StepCard({
             </li>
           ))}
         </ul>
+      )}
+
+      {earlierBlockers.length > 0 && (
+        <p className="order-hint">
+          需先完成{' '}
+          {earlierBlockers
+            .map((b) => `第 ${b.index + 1} 步「${b.step.title}」`)
+            .join('、')}
+          的必需检查点后才能完成本步骤。
+        </p>
       )}
 
       <footer className="step-actions">

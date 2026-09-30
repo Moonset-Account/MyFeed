@@ -147,6 +147,21 @@ body {
 }
 .modal h2 { margin: 0 0 8px; font-size: 1.1rem; color: var(--danger); }
 .modal ul { padding-left: 20px; }
+.modal-block { margin: 8px 0; }
+.modal-block strong { font-size: 0.9rem; }
+.modal-block ul { margin: 4px 0; }
+
+.order-hint {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--warn);
+  background: #fff8ec;
+  font-size: 0.85rem;
+  color: #7a5a12;
+}
+
+.part-removed td { color: #8a6d3b; }
+.removed-mark { display: block; font-size: 0.78rem; color: var(--warn); font-style: normal; }
 
 /* 管理员面板 */
 .admin-panel fieldset {

@@ -11,6 +11,7 @@ import {
   setPaused,
   toggleCheckpoint,
   uncompleteStep,
+  type IncompleteEarlierStep,
 } from './lib/assembly';
 import { clearProgress, loadPlan, loadProgress, savePlan, saveProgress } from './lib/storage';
 import { StepCard } from './components/StepCard';
@@ -21,6 +22,8 @@ import { AdminPanel } from './components/AdminPanel';
 interface BlockedWarning {
   stepTitle: string;
   missing: Checkpoint[];
+  earlier: IncompleteEarlierStep[];
+  paused: boolean;
 }
 
 export default function App() {
@@ -38,9 +41,18 @@ export default function App() {
   const visibleSteps = useMemo(() => searchSteps(plan, query), [plan, query]);
 
   const handleCompleteStep = (step: AssemblyStep) => {
-    const result = completeStep(progress, step);
-    if (result.blockedBy.length > 0) {
-      setWarning({ stepTitle: step.title, missing: result.blockedBy });
+    const result = completeStep(progress, plan, step);
+    if (
+      result.blockedByPause ||
+      result.blockedBy.length > 0 ||
+      result.blockedByEarlier.length > 0
+    ) {
+      setWarning({
+        stepTitle: step.title,
+        missing: result.blockedBy,
+        earlier: result.blockedByEarlier,
+        paused: result.blockedByPause,
+      });
       return;
     }
     setProgress(result.progress);
@@ -164,7 +176,9 @@ export default function App() {
                   onCompleteStep={handleCompleteStep}
                   onUncompleteStep={(stepId) => setProgress(uncompleteStep(progress, stepId))}
                   onReportMissing={(partId, qty, note, stepId) =>
-                    setProgress(reportMissingPart(progress, { partId, quantity: qty, note, stepId }))
+                    setProgress(
+                      reportMissingPart(progress, plan, { partId, quantity: qty, note, stepId }),
+                    )
                   }
                 />
               ))
@@ -177,12 +191,36 @@ export default function App() {
         <div className="modal-backdrop" role="alertdialog" aria-modal="true">
           <div className="modal">
             <h2>无法完成「{warning.stepTitle}」</h2>
-            <p>以下必需检查点尚未勾选，请先逐项确认：</p>
-            <ul>
-              {warning.missing.map((c) => (
-                <li key={c.id}>{c.text}</li>
-              ))}
-            </ul>
+            {warning.paused && (
+              <p>当前处于缺件暂停状态，请先处理补件清单并恢复组装。</p>
+            )}
+            {warning.earlier.length > 0 && (
+              <>
+                <p>请按顺序组装，以下先前步骤仍有未勾选的必需检查点：</p>
+                {warning.earlier.map((item) => (
+                  <div key={item.step.id} className="modal-block">
+                    <strong>
+                      第 {item.index + 1} 步「{item.step.title}」
+                    </strong>
+                    <ul>
+                      {item.missing.map((c) => (
+                        <li key={c.id}>{c.text}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </>
+            )}
+            {warning.missing.length > 0 && (
+              <>
+                <p>本步骤以下必需检查点尚未勾选，请先逐项确认：</p>
+                <ul>
+                  {warning.missing.map((c) => (
+                    <li key={c.id}>{c.text}</li>
+                  ))}
+                </ul>
+              </>
+            )}
             <button type="button" className="btn primary" onClick={() => setWarning(null)}>
               返回检查
             </button>
