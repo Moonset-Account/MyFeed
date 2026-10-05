@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "runtimes": [
+    "node"
+  ],
+  "web_service": "web",
+  "services": [
+    {
+      "name": "web",
+      "command": [
+        "npm",
+        "run",
+        "dev",
+        "--",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "{port}",
+        "--strictPort"
+      ],
+      "cwd": ".",
+      "ready_path": "/",
+      "env": {}
+    }
+  ]
+}
+
