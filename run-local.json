@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "runtimes": [
+    "python"
+  ],
+  "web_service": "web",
+  "services": [
+    {
+      "name": "web",
+      "command": [
+        "{venv_python}",
+        "-m",
+        "uvicorn",
+        "app:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "{port}"
+      ],
+      "cwd": ".",
+      "ready_path": "/health",
+      "env": {},
+      "ready_json": {
+        "status": "ok"
+      }
+    }
+  ]
+}
+
